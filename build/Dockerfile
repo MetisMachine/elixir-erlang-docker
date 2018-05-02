@@ -1,9 +1,9 @@
-FROM tsturzl/alpine-erlang:latest
+FROM skafos/alpine-erlang:20.3.4
 
 MAINTAINER Travis Sturzl <travis@metismachin.com>
 
-ENV REFRESHED_AT=2017-08-08 \
-    ELIXIR_VERSION=v1.5.2
+ENV REFRESHED_AT=2018-04-24 \
+    ELIXIR_VERSION=v1.6.4
 
 RUN \
     apk --no-cache --update upgrade && \
