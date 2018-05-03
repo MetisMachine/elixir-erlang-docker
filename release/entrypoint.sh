@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if test "$(ls -A /etc/envconsul)"; then
+if [ "$(ls -A /etc/envconsul)" ]; then
   echo "envconsul configured, using configured credentials"
   exec /usr/local/bin/envconsul -config=/etc/vault-env "$@"
 else
