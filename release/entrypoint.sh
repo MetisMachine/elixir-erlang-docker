@@ -8,7 +8,7 @@ if [ "$(ls -A /etc/envconsul)" ]; then
     CMD="$CMD -config=$DEREF"
   done
   echo "envconsul configured, using configured credentials"
-  exec "$CMD" "$@"
+  exec "$CMD $@"
 else
   echo "envconsul not configured, running without vault credentials"
   exec "$@"
