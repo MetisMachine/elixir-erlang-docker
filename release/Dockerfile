@@ -102,4 +102,4 @@ WORKDIR ${HOME}
 
 ENTRYPOINT ["/usr/local/bin/entrypoint"]
 
-CMD ["/bin/sh"]
+CMD ["/bin/bash"]
