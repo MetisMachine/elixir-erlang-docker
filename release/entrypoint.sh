@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ "$(ls -A /etc/envconsul)" ]; then
   ARGS=()
