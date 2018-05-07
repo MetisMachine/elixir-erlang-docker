@@ -5,7 +5,9 @@ if [ "$(ls -A /etc/envconsul)" ]; then
   for i in `find /etc/envconsul -name *.hcl -type f`; do
     echo "Loading config: $i"
     DEREF=$(readlink -f $i)
-    ARGS+=("-config=$DEREF")
+    FILE=""
+    if [[ "$?" -eq 0 ]]; then FILE=$DEREF; else FILE=$i; fi
+    ARGS+=("-config=$FILE")
   done
   ARGS+=("$@")
   echo "envconsul configured, using configured credentials"
