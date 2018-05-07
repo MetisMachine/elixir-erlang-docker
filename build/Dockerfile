@@ -2,7 +2,7 @@ FROM skafos/alpine-erlang:20.3.4
 
 MAINTAINER Travis Sturzl <travis@metismachine.com>
 
-ENV REFRESHED_AT=2018-04-24 \
+ENV REFRESHED_AT=2018-05-07 \
     ELIXIR_VERSION=v1.6.4
 
 RUN \
