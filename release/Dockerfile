@@ -1,31 +1,32 @@
-FROM alpine:3.7
+FROM alpine:3.8
 
 MAINTAINER Travis Sturzl <travis@metismachin.com>
 
-ENV REFRESHED_AT=2018-04-24 \
+ENV REFRESHED_AT=2018-09-18 \
     LANG=en_US.UTF-8 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    ERLANG_VERSION=20.3.4
+    ERLANG_VERSION=20.3.8.9
 
 ENV ENVCONSUL_VERSION=0.7.3
 
 WORKDIR /tmp/erlang-build
 
-RUN echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
-    apk add --no-cache --upgrade apk-tools@edge
-
 # Install Erlang
 RUN \
     # Create default user and home directory, set owner to default
-    mkdir -p ${HOME} && \
-    adduser -s /bin/sh -u 1001 -G root -h ${HOME} -S -D default && \
-    chown -R 1001:0 ${HOME} && \
-    # Add edge repos tagged so that we can selectively install edge packages
-    echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
+    mkdir -p "${HOME}" && \
+    adduser -s /bin/sh -u 1001 -G root -h "${HOME}" -S -D default && \
+    chown -R 1001:0 "${HOME}" && \
+    # Add tagged repos as well as the edge repo so that we can selectively install edge packages
+    echo "@main http://dl-cdn.alpinelinux.org/alpine/v3.8/main" >> /etc/apk/repositories && \
+    echo "@community http://dl-cdn.alpinelinux.org/alpine/v3.8/community" >> /etc/apk/repositories && \
+    echo "@edge http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
     # Upgrade Alpine and base packages
     apk --no-cache upgrade && \
+    # Distillery requires bash
+    apk add --no-cache bash && \
     # Install Erlang/OTP deps
     apk add --no-cache pcre@edge && \
     apk add --no-cache \
@@ -36,6 +37,7 @@ RUN \
       zlib-dev && \
     # Install Erlang/OTP build deps
     apk add --no-cache --virtual .erlang-build \
+      dpkg-dev dpkg binutils \
       git autoconf build-base perl-dev && \
     # Shallow clone Erlang/OTP
     git clone -b OTP-$ERLANG_VERSION --single-branch --depth 1 https://github.com/erlang/otp.git . && \
@@ -46,6 +48,7 @@ RUN \
     # Configure
     ./otp_build autoconf && \
     ./configure --prefix=/usr \
+      --build="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
       --sysconfdir=/etc \
       --mandir=/usr/share/man \
       --infodir=/usr/share/info \
@@ -61,7 +64,6 @@ RUN \
       --without-cosProperty \
       --without-cosTime \
       --without-cosTransactions \
-      --without-dialyzer \
       --without-et \
       --without-gs \
       --without-ic \
@@ -73,14 +75,31 @@ RUN \
       --enable-shared-zlib \
       --enable-ssl=dynamic-ssl-lib \
       --enable-hipe && \
-    # Build
-    make -j4 && make install && \
-    # Cleanup
-    apk del --force .erlang-build && \
-    cd $HOME && \
-    rm -rf /tmp/erlang-build && \
-    # Update ca certificates
-    update-ca-certificates --fresh
+      # Build
+      make -j4 && make install && \
+      # Cleanup
+      cd $HOME && \
+      rm -rf /tmp/erlang-build && \
+      # Update ca certificates
+      update-ca-certificates --fresh && \
+      /usr/bin/erl -eval "beam_lib:strip_release('/usr/lib/erlang/lib')" -s init stop > /dev/null && \
+      (/usr/bin/strip /usr/lib/erlang/erts-*/bin/* || true) && \
+      rm -rf /usr/lib/erlang/usr/ && \
+      rm -rf /usr/lib/erlang/misc/ && \
+      for DIR in /usr/lib/erlang/erts* /usr/lib/erlang/lib/*; do \
+          rm -rf ${DIR}/src/*.erl; \
+          rm -rf ${DIR}/doc; \
+          rm -rf ${DIR}/man; \
+          rm -rf ${DIR}/examples; \
+          rm -rf ${DIR}/emacs; \
+          rm -rf ${DIR}/c_src; \
+      done && \
+      rm -rf /usr/lib/erlang/erts-*/lib/ && \
+      rm /usr/lib/erlang/erts-*/bin/dialyzer && \
+      rm /usr/lib/erlang/erts-*/bin/erlc && \
+      rm /usr/lib/erlang/erts-*/bin/typer && \
+      rm /usr/lib/erlang/erts-*/bin/ct_run && \
+      apk del --force .erlang-build
 
 RUN apk --no-cache --update upgrade
 RUN apk update && \
