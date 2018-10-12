@@ -13,6 +13,8 @@ ENV ENVCONSUL_VERSION=0.7.3
 
 WORKDIR /tmp/erlang-build
 
+RUN apk add --no-cache tar
+
 # Install Erlang
 RUN \
     # Create default user and home directory, set owner to default
