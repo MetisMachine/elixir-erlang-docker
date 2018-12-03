@@ -1,9 +1,9 @@
-FROM skafos/alpine-erlang:20.3.8.9
+FROM skafos/alpine-erlang:21.0.4
 
 MAINTAINER Travis Sturzl <travis@metismachine.com>
 
 ENV REFRESHED_AT=2018-09-18 \
-    ELIXIR_VERSION=v1.6.6
+    ELIXIR_VERSION=v1.7.1
 
 WORKDIR /tmp/elixir-build
 

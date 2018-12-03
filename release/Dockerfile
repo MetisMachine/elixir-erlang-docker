@@ -7,7 +7,7 @@ ENV REFRESHED_AT=2018-09-18 \
     HOME=/opt/app/ \
     # Set this so that CTRL+G works properly
     TERM=xterm \
-    ERLANG_VERSION=20.3.8.9
+    ERLANG_VERSION=21.0.4
 
 ENV ENVCONSUL_VERSION=0.7.3
 
