@@ -1,9 +1,9 @@
 FROM skafos/alpine-erlang:21.0.4
 
-MAINTAINER Travis Sturzl <travis@metismachine.com>
+MAINTAINER Morgan Walker <morgan@skafos.ai>
 
 ENV REFRESHED_AT=2018-09-18 \
-    ELIXIR_VERSION=v1.7.1
+    ELIXIR_VERSION=v1.8.2
 
 WORKDIR /tmp/elixir-build
 
@@ -23,4 +23,3 @@ RUN \
     cd $HOME && \
     rm -rf /tmp/elixir-build && \
     apk del --force-broken-world .elixir-build
-
